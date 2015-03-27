@@ -14,22 +14,28 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         // set configuration of the slider
-        let config = SliderConfiguration()
-        //config.draggerImage = UIImage(named: "Dragger")
-        //config.draggerContentMode = UIViewContentMode.ScaleToFill
-        config.draggerImageOpen = UIImage(named: "PanelOpen")
-        config.draggerImageClose = UIImage(named: "PanelClose")
-        //config.widthOpened = 50
-        //config.widthClosed = 10
+        let configLeft = SliderConfiguration()
+        configLeft.draggerImageOpen = UIImage(named: "PanelOpen")
+        configLeft.draggerImageClose = UIImage(named: "PanelClose")
+
+        let configRight = SliderConfiguration()
+        configRight.position = .Right
+        configRight.draggerImageOpen = UIImage(named: "PanelOpen")
+        configRight.draggerImageClose = UIImage(named: "PanelClose")
         
         
         // create and add the slider
-        let slider = SliderViewController(configuration: config)
-        slider.addSliderToViewController(self)
+        let leftSlider = SliderViewController(configuration: configLeft)
+        leftSlider.addSliderToViewController(self)
+        
+        let rightSlider = SliderViewController(configuration: configRight)
+        rightSlider.addSliderToViewController(self)
         
         //create and add a test content
-        let tableVC = TestTableViewController()
-        slider.addContentViewController(tableVC)
+        let leftContent = TestTableViewController()
+        let rightContent = TestTableViewController()
+        leftSlider.addContentViewController(leftContent)
+        rightSlider.addContentViewController(rightContent)
         
     }
 
