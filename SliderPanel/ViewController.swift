@@ -12,17 +12,16 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // set configuration of the slider
         let configLeft = SliderConfiguration()
         configLeft.draggerImageOpen = UIImage(named: "PanelOpen")
         configLeft.draggerImageClose = UIImage(named: "PanelClose")
-
+        
         let configRight = SliderConfiguration()
         configRight.position = .Right
         configRight.draggerImageOpen = UIImage(named: "PanelOpen")
         configRight.draggerImageClose = UIImage(named: "PanelClose")
-        
         
         // create and add the slider
         let leftSlider = SliderViewController(configuration: configLeft)

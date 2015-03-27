@@ -22,7 +22,7 @@ class SliderViewController: UIViewController {
     private var configuration = SliderConfiguration()
     private var currentState = SliderState.Closed
     
-    private var addedViewController: UIViewController?
+    private let overlay = UIButton()
     
     lazy var widthConstraint: NSLayoutConstraint = {
         return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
@@ -66,7 +66,7 @@ class SliderViewController: UIViewController {
         let panRecognizer = UIPanGestureRecognizer(target: self, action: Selector("panRecognized:"))
         draggerView.addGestureRecognizer(panRecognizer)
         
-        if configuration.enableShadow {
+        if configuration.shadowEnabled {
             self.contentView.layer.shadowColor = UIColor.lightGrayColor().CGColor
             self.contentView.layer.shadowRadius = 5
             self.contentView.layer.shadowOpacity = 0.8
@@ -81,10 +81,12 @@ class SliderViewController: UIViewController {
     */
     func addSliderToViewController(viewController: UIViewController) {
         
-        addedViewController = viewController
-        
         viewController.view.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.view.setTranslatesAutoresizingMaskIntoConstraints(false)
+        
+        if configuration.isModal {
+            addModalOverlayToViewController(viewController)
+        }
         
         self.willMoveToParentViewController(viewController)
         viewController.addChildViewController(self)
@@ -126,44 +128,83 @@ class SliderViewController: UIViewController {
         viewController.didMoveToParentViewController(self)
     }
     
+    func openPanel() {
+        
+        currentState = .Opened
+        
+        widthConstraint.constant = panelWidth()
+        
+        self.view.superview!.setNeedsUpdateConstraints()
+        
+        UIView.animateWithDuration(0.3, animations: { () -> Void in
+            self.view.superview!.layoutIfNeeded()
+            
+            self.overlay.alpha = 0.4
+        })
+        
+        draggerView.displayImageForState(currentState, animated: true)
+    }
+    
+    func closePanel() {
+        
+        currentState = .Closed
+        
+        widthConstraint.constant = panelWidth()
+        
+        self.view.superview!.setNeedsUpdateConstraints()
+        
+        UIView.animateWithDuration(0.3, animations: { () -> Void in
+            self.view.superview!.layoutIfNeeded()
+            
+            self.overlay.alpha = 0.0
+        })
+        
+        draggerView.displayImageForState(currentState, animated: true)
+    }
+    
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         
+        //call open again to set the correct width according the changed width of the parent view/device
         if currentState == .Opened {
-            widthConstraint.constant = panelWidth()
+            openPanel()
         }
-        
-        animateWidthChange()
     }
 
+    private func addModalOverlayToViewController(viewController: UIViewController) {
+        
+        overlay.backgroundColor = UIColor.blackColor()
+        overlay.alpha = 0.0
+        overlay.setTranslatesAutoresizingMaskIntoConstraints(false)
+        overlay.addTarget(self, action: Selector("pressedBackground"), forControlEvents: UIControlEvents.TouchUpInside)
+        
+        viewController.view.insertSubview(overlay, belowSubview: self.view)
+        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": overlay]))
+        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": overlay]))
+    }
+    
+    @objc private func pressedBackground() {
+        if currentState == .Opened { //close it
+            closePanel()
+        }
+    }
     
     @objc private func tapRecognized(recognizer: UITapGestureRecognizer) {
         
         if recognizer.state == .Ended {
             
             if currentState == .Opened { //close it
-                currentState = .Closed
+                closePanel()
             }
             else { //open it
-                currentState = .Opened
+                openPanel()
             }
-            
-            widthConstraint.constant = panelWidth()
-            
-            animateWidthChange()
-            
-            draggerView.displayImageForState(currentState, animated: true)
         }
     }
     
     @objc private func panRecognized(recognizer: UIPanGestureRecognizer) {
         
-        let translation = recognizer.translationInView(self.view)
-        
         let velocity = recognizer.velocityInView(self.view)
-        println("vel \(velocity.x)")
-        
         let position = recognizer.locationInView(self.view.superview!)
-        
         
         let maxPosition = panelWidthOpened()
         
@@ -176,45 +217,19 @@ class SliderViewController: UIViewController {
                 else {
                     widthConstraint.constant = position.x
                 }
-                
             }
         }
         else if recognizer.state == .Ended {
 
-            //if widthConstraint.constant >= panelWidthOpened()/2 || position.x >= maxPosition {
-            //if position.x >= maxPosition || velocity.x > 0 {
-            
-            //if widthConstraint.constant >= maxPosition || velocity.x > 0 {
-            if configuration.position == .Left && velocity.x > 0 { //shall be opened
-                draggerView.displayImageForState(.Opened, animated: true)
-                
-                widthConstraint.constant = maxPosition
-                currentState = .Opened
+            if (configuration.position == .Left && velocity.x > 0) || (configuration.position == .Right && velocity.x < 0) {
+
+                openPanel()
             }
-            else if configuration.position == .Right && velocity.x < 0 {
-                draggerView.displayImageForState(.Opened, animated: true)
+            else {
                 
-                widthConstraint.constant = maxPosition
-                currentState = .Opened
+                closePanel()
             }
-            else { //shall be closed
-                draggerView.displayImageForState(.Closed, animated: true)
-                
-                widthConstraint.constant = panelWidthClosed()
-                currentState = .Closed
-            }
-            
-            animateWidthChange(duration: 0.15)
         }
-    }
-    
-    private func animateWidthChange(duration: NSTimeInterval = 0.3) {
-        
-        self.view.superview!.setNeedsUpdateConstraints()
-        
-        UIView.animateWithDuration(duration, animations: { () -> Void in
-            self.view.superview!.layoutIfNeeded()
-        })
     }
     
     private func panelWidthOpened() -> CGFloat {

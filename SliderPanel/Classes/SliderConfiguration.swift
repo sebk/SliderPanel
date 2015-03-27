@@ -21,15 +21,24 @@ class SliderConfiguration {
     var contentBackgroundColor = UIColor.clearColor()
     var draggerBackgroundColor = UIColor.clearColor()
     
+    /// Width of the dragger (tappable and draggable area).
     var draggerWidth = 30.0
+    /// When set this image will be used for opened and closed state.
     var draggerImage: UIImage?
+    /// Set explicit image when the panel is opened.
     var draggerImageOpen: UIImage?
+    /// Set explicit image when panel is closed.
     var draggerImageClose: UIImage?
+    /// Define how the image should be scaled.
     var draggerContentMode = UIViewContentMode.ScaleAspectFit
     
-    var widthOpened: CGFloat? //when not set 1/3 of the width of the superview of the panel will be used
+    /// Maximum width when opened. When not set 1/3 of the width of the superview of the panel will be used.
+    var widthOpened: CGFloat?
+    /// Maxmimum width when closed. Default is 0.
     var widthClosed = CGFloat(0)
     
-    var enableShadow = true 
+    /// Add shadow to content view
+    var shadowEnabled = true
     
+    var isModal = true
 }
