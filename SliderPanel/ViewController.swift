@@ -22,6 +22,7 @@ class ViewController: UIViewController {
         configRight.position = .Right
         configRight.draggerImageOpen = UIImage(named: "PanelOpen")
         configRight.draggerImageClose = UIImage(named: "PanelClose")
+        configRight.expandable = false
         
         // create and add the slider
         let leftSlider = SliderViewController(configuration: configLeft)

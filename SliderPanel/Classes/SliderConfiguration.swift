@@ -37,6 +37,9 @@ class SliderConfiguration {
     /// Maxmimum width when closed. Default is 0.
     var widthClosed = CGFloat(0)
     
+    /// When true the panel can be moved over the widthOpened size.
+    var expandable = true
+    
     /// Add shadow to content view
     var shadowEnabled = true
     

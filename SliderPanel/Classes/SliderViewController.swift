@@ -81,12 +81,7 @@ class SliderViewController: UIViewController {
     */
     func addSliderToViewController(viewController: UIViewController) {
         
-        viewController.view.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.view.setTranslatesAutoresizingMaskIntoConstraints(false)
-        
-        if configuration.isModal {
-            addModalOverlayToViewController(viewController)
-        }
         
         self.willMoveToParentViewController(viewController)
         viewController.addChildViewController(self)
@@ -107,6 +102,10 @@ class SliderViewController: UIViewController {
         viewController.view.addConstraint(widthConstraint)
         
         self.didMoveToParentViewController(viewController)
+        
+        if configuration.isModal {
+            addModalOverlayToViewController(viewController)
+        }
     }
     
     /**
@@ -208,14 +207,26 @@ class SliderViewController: UIViewController {
         
         let maxPosition = panelWidthOpened()
         
+        let currentPosition: (CGFloat) = {
+            if self.configuration.position == .Right {
+                return self.view.superview!.frame.size.width - position.x
+            }
+            else {
+                return position.x
+            }
+        }()
+        
         if recognizer.state == .Changed {
 
             if position.x >= 0 {
-                if configuration.position == .Right {
-                    widthConstraint.constant = (self.view.superview!.frame.size.width - position.x)
+                
+                if configuration.expandable {
+                    widthConstraint.constant = currentPosition
                 }
                 else {
-                    widthConstraint.constant = position.x
+                    if currentPosition <= maxPosition {
+                        widthConstraint.constant = currentPosition
+                    }
                 }
             }
         }
