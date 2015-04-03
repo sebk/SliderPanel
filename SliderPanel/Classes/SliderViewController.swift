@@ -87,16 +87,15 @@ class SliderViewController: UIViewController {
         viewController.addChildViewController(self)
         viewController.view.addSubview(self.view)
         
+        //use full vertical size
         viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[panel]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["panel": self.view]))
         
-        if configuration.position == .Left {
-            let leftConst = NSLayoutConstraint(item: self.view, attribute: .Left, relatedBy: .Equal, toItem: viewController.view, attribute: .Left, multiplier: 1, constant: 0)
-            viewController.view.addConstraint(leftConst)
+        // pin left or right, according to the slider configuration
+        var attribute = NSLayoutAttribute.Left
+        if configuration.position == .Right {
+            attribute = NSLayoutAttribute.Right
         }
-        else {
-            let rightConst = NSLayoutConstraint(item: self.view, attribute: .Right, relatedBy: .Equal, toItem: viewController.view, attribute: .Right, multiplier: 1, constant: 0)
-            viewController.view.addConstraint(rightConst)
-        }
+        viewController.view.addConstraint(NSLayoutConstraint(item: self.view, attribute: attribute, relatedBy: .Equal, toItem: viewController.view, attribute: attribute, multiplier: 1, constant: 0))
         
         widthConstraint.constant = panelWidth()
         viewController.view.addConstraint(widthConstraint)
@@ -111,7 +110,7 @@ class SliderViewController: UIViewController {
     /**
     Add the viewController for the content.
     
-    :param: viewController UIViewController that will add as the content
+    :param: viewController UIViewController that will added as the content
     */
     func addContentViewController(viewController: UIViewController) {
         
@@ -163,7 +162,7 @@ class SliderViewController: UIViewController {
     
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         
-        //call open again to set the correct width according the changed width of the parent view/device
+        //call open again to set the correct width according to the changed width of the parent view
         if currentState == .Opened {
             openPanel()
         }
