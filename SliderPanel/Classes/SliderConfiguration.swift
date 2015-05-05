@@ -22,7 +22,7 @@ class SliderConfiguration {
     var draggerBackgroundColor = UIColor.clearColor()
     
     /// Width of the dragger (tappable and draggable area).
-    var draggerWidth = 30.0
+    var draggerWidth: CGFloat = 30.0
     /// When set this image will be used for opened and closed state.
     var draggerImage: UIImage?
     /// Set explicit image when the panel is opened.
@@ -39,6 +39,8 @@ class SliderConfiguration {
     
     /// When true the panel can be moved over the widthOpened size.
     var expandable = true
+    
+    var stayExpanded = false
     
     /// Add shadow to content view
     var shadowEnabled = true

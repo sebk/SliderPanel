@@ -23,10 +23,13 @@ class SliderViewController: UIViewController {
     private var currentState = SliderState.Closed
     
     private let overlay = UIButton()
-    
-    lazy var widthConstraint: NSLayoutConstraint = {
-        return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
+
+    lazy var widthConstraint: NSLayoutConstraint =  {
+       //return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: self.panelWidth())
+        return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: self.panelWidthOpened())
     }()
+    
+    var positionConstraint: NSLayoutConstraint?
     
     
     convenience init(configuration: SliderConfiguration) {
@@ -95,9 +98,14 @@ class SliderViewController: UIViewController {
         if configuration.position == .Right {
             attribute = NSLayoutAttribute.Right
         }
-        viewController.view.addConstraint(NSLayoutConstraint(item: self.view, attribute: attribute, relatedBy: .Equal, toItem: viewController.view, attribute: attribute, multiplier: 1, constant: 0))
+        //viewController.view.addConstraint(NSLayoutConstraint(item: self.view, attribute: attribute, relatedBy: .Equal, toItem: viewController.view, attribute: attribute, multiplier: 1, constant: 0))
         
-        widthConstraint.constant = panelWidth()
+        positionConstraint = NSLayoutConstraint(item: self.view, attribute: attribute, relatedBy: .Equal, toItem: viewController.view, attribute: attribute, multiplier: 1,
+            constant: -panelWidthOpened() )
+        viewController.view.addConstraint(positionConstraint!)
+        
+        
+        //widthConstraint.constant = panelWidth()
         viewController.view.addConstraint(widthConstraint)
         
         self.didMoveToParentViewController(viewController)
@@ -130,7 +138,8 @@ class SliderViewController: UIViewController {
         
         currentState = .Opened
         
-        widthConstraint.constant = panelWidth()
+        //widthConstraint.constant = panelWidth()
+        positionConstraint?.constant = 0
         
         self.view.superview!.setNeedsUpdateConstraints()
         
@@ -147,7 +156,8 @@ class SliderViewController: UIViewController {
         
         currentState = .Closed
         
-        widthConstraint.constant = panelWidth()
+        //widthConstraint.constant = panelWidth()
+        positionConstraint?.constant = -panelWidthOpened()
         
         self.view.superview!.setNeedsUpdateConstraints()
         
@@ -190,10 +200,12 @@ class SliderViewController: UIViewController {
         
         if recognizer.state == .Ended {
             
-            if currentState == .Opened { //close it
+            if currentState == .Opened {
                 closePanel()
+                
+                widthConstraint.constant = panelWidthOpened()
             }
-            else { //open it
+            else {
                 openPanel()
             }
         }
@@ -202,7 +214,10 @@ class SliderViewController: UIViewController {
     @objc private func panRecognized(recognizer: UIPanGestureRecognizer) {
         
         let velocity = recognizer.velocityInView(self.view)
-        let position = recognizer.locationInView(self.view.superview!)
+
+        let position = recognizer.translationInView(self.view.superview!)
+        
+        let location = recognizer.locationInView(self.view.superview!)
         
         let maxPosition = panelWidthOpened()
         
@@ -217,27 +232,61 @@ class SliderViewController: UIViewController {
         
         if recognizer.state == .Changed {
 
-            if position.x >= 0 {
+            if velocity.x > 0 {
                 
-                if configuration.expandable {
-                    widthConstraint.constant = currentPosition
+                // be sure that the panel can not move into the screen and is attached to the edge
+                if positionConstraint?.constant > 0 {
+                    positionConstraint?.constant = 0
                 }
-                else {
-                    if currentPosition <= maxPosition {
-                        widthConstraint.constant = currentPosition
-                    }
+                
+                if positionConstraint?.constant < 0 {
+
+                    positionConstraint?.constant = location.x - panelWidthOpened()
+                }
+                
+                else if positionConstraint?.constant == 0 && configuration.expandable && location.x >= panelWidthOpened() {
+                    
+                    widthConstraint.constant = location.x
+                }
+                
+            }
+            else {
+                
+                if location.x > panelWidthOpened() {
+                    
+                    widthConstraint.constant = location.x
+                    
+                    positionConstraint?.constant = 0
+                }
+                
+                else  {
+                    
+                    positionConstraint?.constant = location.x - panelWidthOpened()
                 }
             }
+            
+
         }
+            
         else if recognizer.state == .Ended {
 
             if (configuration.position == .Left && velocity.x > 0) || (configuration.position == .Right && velocity.x < 0) {
 
                 openPanel()
+                
+                if !configuration.stayExpanded {
+                    widthConstraint.constant = panelWidthOpened()
+                }
             }
-            else {
+            //else {
+            else if location.x <= panelWidthOpened() {
                 
                 closePanel()
+                
+                widthConstraint.constant = panelWidthOpened()
+            }
+            else {
+                openPanel()
             }
         }
     }
