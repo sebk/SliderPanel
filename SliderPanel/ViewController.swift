@@ -24,7 +24,8 @@ class ViewController: UIViewController {
         configRight.position = .Right
         configRight.draggerImageOpen = UIImage(named: "PanelOpen")
         configRight.draggerImageClose = UIImage(named: "PanelClose")
-        configRight.expandable = false
+        configRight.expandable = true
+        //configRight.stayExpanded = true
         
         // create and add the slider
         let leftSlider = SliderViewController(configuration: configLeft)
@@ -39,7 +40,7 @@ class ViewController: UIViewController {
         let leftContent = TestTableViewController()
         let rightContent = TestTableViewController()
         leftSlider.addContentViewController(leftContent)
-        //rightSlider.addContentViewController(rightContent)
+        rightSlider.addContentViewController(rightContent)
         
     }
 

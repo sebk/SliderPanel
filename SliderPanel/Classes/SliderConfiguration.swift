@@ -33,9 +33,12 @@ class SliderConfiguration {
     var draggerContentMode = UIViewContentMode.ScaleAspectFit
     
     /// Maximum width when opened. When not set 1/3 of the width of the superview of the panel will be used.
-    var widthOpened: CGFloat?
+    //var widthOpened: CGFloat?
     /// Maxmimum width when closed. Default is 0.
-    var widthClosed = CGFloat(0)
+    //var widthClosed = CGFloat(0)
+    
+    /// Width of the panel
+    var width: CGFloat?
     
     /// When true the panel can be moved over the widthOpened size.
     var expandable = true
