@@ -23,10 +23,12 @@ class SliderViewController: UIViewController {
     private var currentState = SliderState.Closed
     
     private let overlay = UIButton()
-    
-    lazy var widthConstraint: NSLayoutConstraint = {
-        return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
+
+    lazy var widthConstraint: NSLayoutConstraint =  {
+        return NSLayoutConstraint(item: self.contentView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: self.panelWidthOpened())
     }()
+    
+    var positionConstraint: NSLayoutConstraint!
     
     
     convenience init(configuration: SliderConfiguration) {
@@ -95,9 +97,17 @@ class SliderViewController: UIViewController {
         if configuration.position == .Right {
             attribute = NSLayoutAttribute.Right
         }
-        viewController.view.addConstraint(NSLayoutConstraint(item: self.view, attribute: attribute, relatedBy: .Equal, toItem: viewController.view, attribute: attribute, multiplier: 1, constant: 0))
         
-        widthConstraint.constant = panelWidth()
+        positionConstraint = NSLayoutConstraint(item: self.view,
+            attribute: attribute,
+            relatedBy: .Equal,
+            toItem: viewController.view,
+            attribute: attribute,
+            multiplier: 1,
+            constant: configuration.position == .Left ? -panelWidthOpened() : panelWidthOpened() )
+        
+        viewController.view.addConstraint(positionConstraint)
+        
         viewController.view.addConstraint(widthConstraint)
         
         self.didMoveToParentViewController(viewController)
@@ -126,11 +136,15 @@ class SliderViewController: UIViewController {
         viewController.didMoveToParentViewController(self)
     }
     
+    /**
+    Open the panel.
+    The width of the panel will not be changed, only gthe position.
+    */
     func openPanel() {
         
         currentState = .Opened
         
-        widthConstraint.constant = panelWidth()
+        positionConstraint.constant = 0
         
         self.view.superview!.setNeedsUpdateConstraints()
         
@@ -143,11 +157,16 @@ class SliderViewController: UIViewController {
         draggerView.displayImageForState(currentState, animated: true)
     }
     
+    /**
+    Close the panel.
+    This method will change the position, so it is outside of the screen and will set the width of the panel to the default or set one.
+    */
     func closePanel() {
         
         currentState = .Closed
         
-        widthConstraint.constant = panelWidth()
+        positionConstraint.constant = configuration.position == .Left ? -panelWidthOpened() : panelWidthOpened()
+        widthConstraint.constant = panelWidthOpened()
         
         self.view.superview!.setNeedsUpdateConstraints()
         
@@ -162,12 +181,17 @@ class SliderViewController: UIViewController {
     
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         
-        //call open again to set the correct width according to the changed width of the parent view
+        // call openPanel() again to set the correct width according to the changed width of the parent view
         if currentState == .Opened {
             openPanel()
         }
     }
 
+    /**
+    Add a transparent (black color with alpha) view.
+    This is used when the panel is opened.
+    :param: viewController UIViewController that is used to insert the gray view
+    */
     private func addModalOverlayToViewController(viewController: UIViewController) {
         
         overlay.backgroundColor = UIColor.blackColor()
@@ -180,29 +204,54 @@ class SliderViewController: UIViewController {
         viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": overlay]))
     }
     
+    /**
+    Grayed background is pressed. This will close the panel.
+    */
     @objc private func pressedBackground() {
         if currentState == .Opened { //close it
             closePanel()
         }
     }
     
+    /**
+    A tap on the dragger is recognized.
+    This will open or close the panel (according to the current state).
+    :param: recognizer UITapGestureRecognizer
+    */
     @objc private func tapRecognized(recognizer: UITapGestureRecognizer) {
         
         if recognizer.state == .Ended {
             
-            if currentState == .Opened { //close it
+            if currentState == .Opened {
                 closePanel()
+                
+                widthConstraint.constant = panelWidthOpened()
             }
-            else { //open it
+            else {
                 openPanel()
             }
         }
     }
     
+    /**
+    Moving gesture recognized.
+    This will move the panel according to the options (expandable, stayExpanded, ...).
+    :param: recognizer UIPanGestureRecognizer
+    */
     @objc private func panRecognized(recognizer: UIPanGestureRecognizer) {
         
         let velocity = recognizer.velocityInView(self.view)
-        let position = recognizer.locationInView(self.view.superview!)
+
+        let position = recognizer.translationInView(self.view.superview!)
+        
+        let location: (CGFloat) = {
+            if self.configuration.position == .Right {
+                return self.view.superview!.bounds.size.width - recognizer.locationInView(self.view.superview!).x
+            }
+            else {
+                return recognizer.locationInView(self.view.superview!).x
+            }
+        }()
         
         let maxPosition = panelWidthOpened()
         
@@ -217,51 +266,140 @@ class SliderViewController: UIViewController {
         
         if recognizer.state == .Changed {
 
-            if position.x >= 0 {
+            if configuration.position == .Left {
                 
-                if configuration.expandable {
-                    widthConstraint.constant = currentPosition
+                if velocity.x > 0 { // open
+                    
+                    // be sure that the panel can not move into the screen and is attached to the edge
+                    if positionConstraint.constant > 0 {
+                        positionConstraint.constant = 0
+                    }
+                    // move the panel into the screen
+                    if positionConstraint.constant < 0 {
+                        
+                        positionConstraint.constant = location - panelWidthOpened()
+                    }
+                    // panel is opened - change only the width when it is expandable
+                    else if positionConstraint.constant == 0 && configuration.expandable && location >= panelWidthOpened() {
+                        
+                        widthConstraint.constant = location
+                    }
+                    
                 }
-                else {
-                    if currentPosition <= maxPosition {
-                        widthConstraint.constant = currentPosition
+                else { //close
+                    
+                    // panel is expanded - first close the expanded width
+                    if location > panelWidthOpened() {
+                        
+                        widthConstraint.constant = location
+                        
+                        positionConstraint.constant = 0
+                    }
+                    // panel is not expanded - movie it out of the screen
+                    else  {
+                        
+                        positionConstraint.constant = location - panelWidthOpened()
                     }
                 }
             }
+                
+            else { // .Right
+                
+                if velocity.x < 0 { // open
+
+                    // be sure that the panel can not move into the screen and is attached to the edge
+                    if positionConstraint.constant <= 0 {
+                        positionConstraint.constant = 0
+                    }
+                    // move the panel into the screen
+                    else if positionConstraint.constant <= panelWidthOpened() && positionConstraint.constant > 0 {
+
+                        positionConstraint.constant = panelWidthOpened() - abs(position.x)
+                    }
+                    // panel is opened and is expandable - change the width
+                    if positionConstraint.constant == 0 && configuration.expandable {
+                        
+                        widthConstraint.constant = location
+                    }
+                    
+                }
+                else { // close
+                    
+                    // panel is expanded - change the width
+                    if positionConstraint.constant == 0 && location >= panelWidthOpened() {
+                        
+                        widthConstraint.constant = location //only change the width
+
+                    }
+                    // panel is not expanded
+                    else {
+                        // finger is at the position of the panel
+                        if location <= panelWidthOpened() {
+                            
+                            // move the panel
+                            positionConstraint.constant = panelWidthOpened() - location
+                            
+                        }
+                    }
+                }
+                
+            } // .Right
+            
         }
+            
         else if recognizer.state == .Ended {
 
+            // open the panel when the user moved the panel into the screen
             if (configuration.position == .Left && velocity.x > 0) || (configuration.position == .Right && velocity.x < 0) {
 
                 openPanel()
+                
+                if !configuration.stayExpanded {
+                    widthConstraint.constant = panelWidthOpened()
+                }
             }
-            else {
+            // the panel was not opened completly by the user and the moving direction changed (into the closing direction).
+            else if location <= panelWidthOpened() {
                 
                 closePanel()
+                
+                widthConstraint.constant = panelWidthOpened()
+            }
+            else {
+                if configuration.position == .Left {
+                    openPanel()
+                }
+                else {
+                    // be sure to keep the panel at the position/width when it can stay expanded, or change the panel when stayExpanded is false
+                    if !configuration.stayExpanded {
+                        if widthConstraint.constant >= panelWidthOpened() {
+                            widthConstraint.constant = panelWidthOpened()
+                            openPanel()
+                        }
+                        else {
+                            closePanel()
+                        }
+                    }
+                    else {
+                        openPanel()
+                    }
+                }
+                
             }
         }
     }
     
+    /**
+    When `width`is set in the configuration this value will be used. Otherwise 1/3 of the screeen will be used.
+    
+    :returns: Width of the panel when it is opened
+    */
     private func panelWidthOpened() -> CGFloat {
-        if let width = configuration.widthOpened {
+        if let width = configuration.width {
             return width
         }
         else {
             return CGFloat(self.view.superview!.frame.size.width / 3)
-        }
-    }
-    
-    private func panelWidthClosed() -> CGFloat {
-        return configuration.widthClosed
-    }
-    
-    private func panelWidth() -> CGFloat {
-        
-        if currentState == .Closed {
-            return panelWidthClosed()
-        }
-        else {
-            return panelWidthOpened()
         }
     }
     
