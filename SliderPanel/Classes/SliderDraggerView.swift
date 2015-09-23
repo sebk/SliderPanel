@@ -23,12 +23,12 @@ class SliderDraggerView: UIView {
 
     private func addDraggerImageView() {
         
-        draggerImageView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        draggerImageView.translatesAutoresizingMaskIntoConstraints = false
         draggerImageView.contentMode = configuration.draggerContentMode
         
         self.addSubview(draggerImageView)
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[iV]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["iV": draggerImageView]))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[iV]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["iV": draggerImageView]))
+        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[iV]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["iV": draggerImageView]))
+        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[iV]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["iV": draggerImageView]))
     }
     
     func displayImageForState(state: SliderState, animated: Bool) {

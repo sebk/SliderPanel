@@ -39,10 +39,10 @@ class SliderViewController: UIViewController {
     
     override func viewDidLoad() {
         
-        contentView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(contentView)
         
-        draggerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        draggerView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(draggerView)
         
         contentView.backgroundColor = configuration.contentBackgroundColor
@@ -55,10 +55,10 @@ class SliderViewController: UIViewController {
             hFormat = "H:|[draggerView(w)][contentView]|"
         }
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat(hFormat, options: NSLayoutFormatOptions(0), metrics: ["w": draggerWidth], views: ["contentView": contentView, "draggerView": draggerView] ))
+        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat(hFormat, options: NSLayoutFormatOptions(rawValue: 0), metrics: ["w": draggerWidth], views: ["contentView": contentView, "draggerView": draggerView] ))
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[contentView]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["contentView": contentView]))
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[draggerView]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["draggerView": draggerView]))
+        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[contentView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["contentView": contentView]))
+        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[draggerView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["draggerView": draggerView]))
         
         draggerView.displayImageForState(currentState, animated: false)
         
@@ -79,18 +79,18 @@ class SliderViewController: UIViewController {
     /**
     Add the slider panel to the given viewController.
     
-    :param: viewController UIViewController on which the panel will be added
+    - parameter viewController: UIViewController on which the panel will be added
     */
     func addSliderToViewController(viewController: UIViewController) {
         
-        self.view.setTranslatesAutoresizingMaskIntoConstraints(false)
+        self.view.translatesAutoresizingMaskIntoConstraints = false
         
         self.willMoveToParentViewController(viewController)
         viewController.addChildViewController(self)
         viewController.view.addSubview(self.view)
         
         //use full vertical size
-        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[panel]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["panel": self.view]))
+        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[panel]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["panel": self.view]))
         
         // pin left or right, according to the slider configuration
         var attribute = NSLayoutAttribute.Left
@@ -120,18 +120,18 @@ class SliderViewController: UIViewController {
     /**
     Add the viewController for the content.
     
-    :param: viewController UIViewController that will added as the content
+    - parameter viewController: UIViewController that will added as the content
     */
     func addContentViewController(viewController: UIViewController) {
         
-        viewController.view.setTranslatesAutoresizingMaskIntoConstraints(false)
+        viewController.view.translatesAutoresizingMaskIntoConstraints = false
         
         viewController.willMoveToParentViewController(self)
         self.addChildViewController(viewController)
         contentView.addSubview(viewController.view)
         
-        contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": viewController.view]))
-        contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": viewController.view]))
+        contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[view]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["view": viewController.view]))
+        contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["view": viewController.view]))
         
         viewController.didMoveToParentViewController(self)
     }
@@ -190,18 +190,18 @@ class SliderViewController: UIViewController {
     /**
     Add a transparent (black color with alpha) view.
     This is used when the panel is opened.
-    :param: viewController UIViewController that is used to insert the gray view
+    - parameter viewController: UIViewController that is used to insert the gray view
     */
     private func addModalOverlayToViewController(viewController: UIViewController) {
         
         overlay.backgroundColor = UIColor.blackColor()
         overlay.alpha = 0.0
-        overlay.setTranslatesAutoresizingMaskIntoConstraints(false)
+        overlay.translatesAutoresizingMaskIntoConstraints = false
         overlay.addTarget(self, action: Selector("pressedBackground"), forControlEvents: UIControlEvents.TouchUpInside)
         
         viewController.view.insertSubview(overlay, belowSubview: self.view)
-        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": overlay]))
-        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(0), metrics: nil, views: ["view": overlay]))
+        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[view]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["view": overlay]))
+        viewController.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[view]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["view": overlay]))
     }
     
     /**
@@ -216,7 +216,7 @@ class SliderViewController: UIViewController {
     /**
     A tap on the dragger is recognized.
     This will open or close the panel (according to the current state).
-    :param: recognizer UITapGestureRecognizer
+    - parameter recognizer: UITapGestureRecognizer
     */
     @objc private func tapRecognized(recognizer: UITapGestureRecognizer) {
         
@@ -236,7 +236,7 @@ class SliderViewController: UIViewController {
     /**
     Moving gesture recognized.
     This will move the panel according to the options (expandable, stayExpanded, ...).
-    :param: recognizer UIPanGestureRecognizer
+    - parameter recognizer: UIPanGestureRecognizer
     */
     @objc private func panRecognized(recognizer: UIPanGestureRecognizer) {
         
@@ -253,8 +253,7 @@ class SliderViewController: UIViewController {
             }
         }()
         
-        let maxPosition = panelWidthOpened()
-        
+        /*
         let currentPosition: (CGFloat) = {
             if self.configuration.position == .Right {
                 return self.view.superview!.frame.size.width - position.x
@@ -263,6 +262,7 @@ class SliderViewController: UIViewController {
                 return position.x
             }
         }()
+*/
         
         if recognizer.state == .Changed {
 
@@ -392,7 +392,7 @@ class SliderViewController: UIViewController {
     /**
     When `width`is set in the configuration this value will be used. Otherwise 1/3 of the screeen will be used.
     
-    :returns: Width of the panel when it is opened
+    - returns: Width of the panel when it is opened
     */
     private func panelWidthOpened() -> CGFloat {
         if let width = configuration.width {

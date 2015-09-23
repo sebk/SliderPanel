@@ -31,22 +31,14 @@ class SliderConfiguration {
     var draggerImageClose: UIImage?
     /// Define how the image should be scaled.
     var draggerContentMode = UIViewContentMode.ScaleAspectFit
-    
-    /// Maximum width when opened. When not set 1/3 of the width of the superview of the panel will be used.
-    //var widthOpened: CGFloat?
-    /// Maxmimum width when closed. Default is 0.
-    //var widthClosed = CGFloat(0)
-    
     /// Width of the panel
     var width: CGFloat?
-    
     /// When true the panel can be moved over the widthOpened size.
     var expandable = true
-    
+    /// Only when expandable is true. When true the slider will stay at the expanded size.
     var stayExpanded = false
-    
     /// Add shadow to content view
     var shadowEnabled = true
-    
+    /// When true a gray overlay will be added when the slider is opened. 
     var isModal = true
 }

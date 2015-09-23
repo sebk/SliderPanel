@@ -29,7 +29,7 @@ class ViewController: UIViewController {
         
         // create and add the slider
         let leftSlider = SliderViewController(configuration: configLeft)
-        //leftSlider.addSliderToViewController(self)
+        leftSlider.addSliderToViewController(self)
         
         let rightSlider = SliderViewController(configuration: configRight)
         rightSlider.addSliderToViewController(self)
