@@ -29,18 +29,20 @@ class ViewController: UIViewController {
         
         // create and add the slider
         let leftSlider = SliderViewController(configuration: configLeft)
-        leftSlider.addSliderToViewController(self)
+        leftSlider.addSliderToViewController(viewController: self)
         
         let rightSlider = SliderViewController(configuration: configRight)
-        rightSlider.addSliderToViewController(self)
+        rightSlider.addSliderToViewController(viewController: self)
         
         
         
         //create and add a test content
         let leftContent = TestTableViewController()
+        leftContent.uiTestIdentifier = "Content Table left"
         let rightContent = TestTableViewController()
-        leftSlider.addContentViewController(leftContent)
-        rightSlider.addContentViewController(rightContent)
+        rightContent.uiTestIdentifier = "Content Table right"
+        leftSlider.addContentViewController(viewController: leftContent)
+        rightSlider.addContentViewController(viewController: rightContent)
         
     }
 

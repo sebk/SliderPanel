@@ -27,8 +27,14 @@ class SliderDraggerView: UIView {
         draggerImageView.contentMode = configuration.draggerContentMode
         
         self.addSubview(draggerImageView)
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[iV]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["iV": draggerImageView]))
-        self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[iV]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["iV": draggerImageView]))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[iV]|",
+                                                           options: NSLayoutFormatOptions(rawValue: 0),
+                                                           metrics: nil,
+                                                           views: ["iV": draggerImageView]))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[iV]|",
+                                                           options: NSLayoutFormatOptions(rawValue: 0),
+                                                           metrics: nil,
+                                                           views: ["iV": draggerImageView]))
     }
     
     func displayImageForState(state: SliderState, animated: Bool) {
@@ -54,7 +60,7 @@ class SliderDraggerView: UIView {
         }
         
         if animated {
-            UIView.animateWithDuration(0.3, animations: { () -> Void in
+            UIView.animate(withDuration: 0.3, animations: { () -> Void in
                 self.draggerImageView.image = draggerImage
             })
         }

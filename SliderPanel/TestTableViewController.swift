@@ -11,41 +11,30 @@ import UIKit
 
 class TestTableViewController: UITableViewController {
     
+    var uiTestIdentifier: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "CELL_ID")
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CELL_ID")
+        
+        self.tableView.accessibilityIdentifier = uiTestIdentifier
     }
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 50
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        /*
-        var cell: UITableViewCell? = tableView.dequeueReusableCellWithIdentifier("CELL_ID") as? UITableViewCell
-
-        if(cell == nil) {
-            
-            cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "CELL_ID")
-        }
-        
-        cell!.textLabel!.text = "Test \(indexPath.row)"
-        
-        return cell!
-*/
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("CELL_ID", forIndexPath: indexPath)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CELL_ID", for: indexPath as IndexPath)
         
         cell.textLabel!.text = "Test \(indexPath.row)"
         
         return cell
-        
     }
 
 }

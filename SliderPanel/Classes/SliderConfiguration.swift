@@ -18,8 +18,8 @@ class SliderConfiguration {
     
     var position = SliderPosition.Left
     
-    var contentBackgroundColor = UIColor.clearColor()
-    var draggerBackgroundColor = UIColor.clearColor()
+    var contentBackgroundColor = UIColor.clear
+    var draggerBackgroundColor = UIColor.clear
     
     /// Width of the dragger (tappable and draggable area).
     var draggerWidth: CGFloat = 30.0
@@ -30,7 +30,7 @@ class SliderConfiguration {
     /// Set explicit image when panel is closed.
     var draggerImageClose: UIImage?
     /// Define how the image should be scaled.
-    var draggerContentMode = UIViewContentMode.ScaleAspectFit
+    var draggerContentMode = UIViewContentMode.scaleAspectFit
     /// Width of the panel
     var width: CGFloat?
     /// When true the panel can be moved over the widthOpened size.
