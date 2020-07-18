@@ -28,11 +28,11 @@ class SliderDraggerView: UIView {
         
         self.addSubview(draggerImageView)
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[iV]|",
-                                                           options: NSLayoutFormatOptions(rawValue: 0),
+                                                           options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                            metrics: nil,
                                                            views: ["iV": draggerImageView]))
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[iV]|",
-                                                           options: NSLayoutFormatOptions(rawValue: 0),
+                                                           options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                            metrics: nil,
                                                            views: ["iV": draggerImageView]))
     }

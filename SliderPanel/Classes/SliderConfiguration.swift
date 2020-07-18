@@ -30,7 +30,7 @@ class SliderConfiguration {
     /// Set explicit image when panel is closed.
     var draggerImageClose: UIImage?
     /// Define how the image should be scaled.
-    var draggerContentMode = UIViewContentMode.scaleAspectFit
+    var draggerContentMode = UIView.ContentMode.scaleAspectFit
     /// Width of the panel
     var width: CGFloat?
     /// When true the panel can be moved over the widthOpened size.

@@ -62,16 +62,16 @@ class SliderViewController: UIViewController {
         }
         
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: hFormat,
-                                                                options: NSLayoutFormatOptions(rawValue: 0),
+                                                                options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                 metrics: ["w": draggerWidth],
                                                                 views: ["contentView": contentView, "draggerView": draggerView] ))
         
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[contentView]|",
-                                                                options: NSLayoutFormatOptions(rawValue: 0),
+                                                                options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                 metrics: nil,
                                                                 views: ["contentView": contentView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[draggerView]|",
-                                                                options: NSLayoutFormatOptions(rawValue: 0),
+                                                                options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                 metrics: nil,
                                                                 views: ["draggerView": draggerView]))
         
@@ -100,23 +100,23 @@ class SliderViewController: UIViewController {
         
         self.view.translatesAutoresizingMaskIntoConstraints = false
         
-        self.willMove(toParentViewController: viewController)
-        viewController.addChildViewController(self)
+        self.willMove(toParent: viewController)
+        viewController.addChild(self)
         viewController.view.addSubview(self.view)
         
         //use full vertical size
         viewController.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[panel]|",
-                                                                          options: NSLayoutFormatOptions(rawValue: 0),
+                                                                          options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                           metrics: nil,
-                                                                          views: ["panel": self.view]))
+                                                                          views: ["panel": self.view!]))
         
         // pin left or right, according to the slider configuration
-        var attribute = NSLayoutAttribute.left
+        var attribute = NSLayoutConstraint.Attribute.left
         if configuration.position == .Right {
-            attribute = NSLayoutAttribute.right
+            attribute = NSLayoutConstraint.Attribute.right
         }
         
-        positionConstraint = NSLayoutConstraint(item: self.view,
+        positionConstraint = NSLayoutConstraint(item: self.view!,
             attribute: attribute,
             relatedBy: .equal,
             toItem: viewController.view,
@@ -128,7 +128,7 @@ class SliderViewController: UIViewController {
         
         viewController.view.addConstraint(widthConstraint)
         
-        self.didMove(toParentViewController: viewController)
+        self.didMove(toParent: viewController)
         
         if configuration.isModal {
             addModalOverlayToViewController(viewController: viewController)
@@ -144,20 +144,20 @@ class SliderViewController: UIViewController {
         
         viewController.view.translatesAutoresizingMaskIntoConstraints = false
         
-        viewController.willMove(toParentViewController: self)
-        self.addChildViewController(viewController)
+        viewController.willMove(toParent: self)
+        self.addChild(viewController)
         contentView.addSubview(viewController.view)
         
         contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",
-                                                                  options: NSLayoutFormatOptions(rawValue: 0),
+                                                                  options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                   metrics: nil,
-                                                                  views: ["view": viewController.view]))
+                                                                  views: ["view": viewController.view!]))
         contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",
-                                                                  options: NSLayoutFormatOptions(rawValue: 0),
+                                                                  options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                   metrics: nil,
-                                                                  views: ["view": viewController.view]))
+                                                                  views: ["view": viewController.view!]))
         
-        viewController.didMove(toParentViewController: self)
+        viewController.didMove(toParent: self)
     }
     
     /**
@@ -221,15 +221,15 @@ class SliderViewController: UIViewController {
         overlay.backgroundColor = UIColor.black
         overlay.alpha = 0.0
         overlay.translatesAutoresizingMaskIntoConstraints = false
-        overlay.addTarget(self, action: #selector(SliderViewController.pressedBackground), for: UIControlEvents.touchUpInside)
+        overlay.addTarget(self, action: #selector(SliderViewController.pressedBackground), for: UIControl.Event.touchUpInside)
         
         viewController.view.insertSubview(overlay, belowSubview: self.view)
         viewController.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",
-                                                                          options: NSLayoutFormatOptions(rawValue: 0),
+                                                                          options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                           metrics: nil,
                                                                           views: ["view": overlay]))
         viewController.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",
-                                                                          options: NSLayoutFormatOptions(rawValue: 0),
+                                                                          options: NSLayoutConstraint.FormatOptions(rawValue: 0),
                                                                           metrics: nil,
                                                                           views: ["view": overlay]))
     }

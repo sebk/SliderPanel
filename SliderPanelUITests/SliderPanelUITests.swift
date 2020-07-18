@@ -13,7 +13,6 @@ class SliderPanelUITests: XCTestCase {
     
     var app: XCUIApplication!
 
-    
     override func setUp() {
         super.setUp()
         
@@ -35,23 +34,22 @@ class SliderPanelUITests: XCTestCase {
     }
     
     func testOpenLeftPanel() {
-        let element: XCUIElement = XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element(boundBy: 0).children(matching: .other).element(boundBy: 1)
-        element.tap()
-        
         let tableView = app.tables.containing(.table, identifier: "Content Table left")
         let window = app.windows.element(boundBy: 0)
+        let element = app.children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element
+        
+        element.children(matching: .other).element(boundBy: 0).children(matching: .other).element(boundBy: 1).tap()
         
         XCTAssert(window.frame.contains(tableView.element.frame))
     }
     
     func testClosePanel() {
-        
-        let element = XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element(boundBy: 0).children(matching: .other).element(boundBy: 1)
-        element.tap()
-        element.tap()
-        
         let tableView = app.tables.containing(.table, identifier: "Content Table left")
         let window = app.windows.element(boundBy: 0)
+        let element = XCUIApplication().children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element
+        
+        element.children(matching: .other).element(boundBy: 0).children(matching: .other).element(boundBy: 1).tap()
+        element.children(matching: .button).element(boundBy: 0).tap()
         
         XCTAssertFalse(window.frame.contains(tableView.element.frame))
     }
